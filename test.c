@@ -8,6 +8,84 @@
 #define LSH_TOK_BUFSIZE 64
 #define LSH_TOK_DELIM " \t\r\n\a"
 
+void
+red()
+{
+	printf("\033[0;31m");
+}
+
+void
+red_bold()
+{
+	printf("\033[1;31m");
+}
+
+void
+green()
+{
+	printf("\033[0;32m");
+}
+
+void
+green_bold()
+{
+	printf("\033[1;32m");
+}
+
+void
+yellow()
+{
+	printf("\033[0;33m");
+}
+
+void
+yellow_bold()
+{
+	printf("\033[01;33m");
+}
+
+void
+blue()
+{
+	printf("\033[0;34m");
+}
+
+void
+blue_bold()
+{
+	printf("\033[1;34m");
+}
+
+void
+magenta()
+{
+	printf("\033[0;35m");
+}
+
+void
+magenta_bold()
+{
+	printf("\033[1;35m");
+}
+
+void
+cyan()
+{
+	printf("\033[0;36m");
+}
+
+void
+cyan_bold()
+{	
+	printf("\033[1;36m");
+}
+
+void
+reset()
+{
+	printf("\033[0m");
+}
+
 
 /*
  * Reads a line of input from the terminal
@@ -42,7 +120,9 @@ lsh_split_line(char* line)
 	char *token;
 
 	if (!tokens) {
+		red_bold();
 		fprintf(stderr, "lsh: allocation error\n");
+		reset();
 		exit(EXIT_FAILURE);
 	}
 
@@ -55,7 +135,9 @@ lsh_split_line(char* line)
 			bufsize += LSH_TOK_BUFSIZE;
 			tokens = realloc(tokens, bufsize * sizeof(char*));
 			if (!tokens) {
+				red_bold();
 				fprintf(stderr, "lsh: allocation error\n");
+				reset();
 				exit(EXIT_FAILURE);
 			}
 		}
@@ -125,7 +207,9 @@ int
 lsh_cd(char **args)
 {
 	if (args[1] == NULL) {
+		red();
 		fprintf(stderr, "lsh: expected argument to \"cd\"\n");
+		reset();
 	} else {
 		if (chdir(args[1]) != 0) {
 			perror("lsh");
@@ -138,17 +222,19 @@ int
 lsh_help(char**args)
 {
 	int i;
-	printf("Psiayn's LSH (Inspired by Stephen Brennans's LSH)\n");
+	magenta_bold();
+	printf("Psiayn's psiterm (Inspired by Stephen Brennans's LSH)\n");
 	printf("Type program names and arguments, and hit enter.\n");
 	printf("The following commands are builtin:\n");
-	
+	reset();
 	int lsh_num = lsh_num_builtins();
 
 	for (i = 0; i < lsh_num; i++) {
 		printf( " %s\n", builtin_str[i]);	
 	}
-	
+	yellow();
 	printf("Use the \"man\" command for information on other programs.\n");
+	reset();
 	return 1;
 }
 
@@ -188,7 +274,9 @@ lsh_loop(void)
 	char **args;
 	int status;
 	do {
-		printf("> ");
+		cyan();
+		printf("𝚿 ");
+		reset();
 		line = lsh_read_line();
 		args = lsh_split_line(line);
 		status = lsh_execute(args);
