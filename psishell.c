@@ -1,9 +1,12 @@
+#include <asm-generic/errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
 #include <string.h>
+#include <termios.h>
+#include "psishell.h"
 
 #define LSH_TOK_BUFSIZE 64
 #define LSH_TOK_DELIM " \t\r\n\a"
@@ -86,7 +89,17 @@ reset()
 	printf("\033[0m");
 }
 
+char* builtin_str[] = {
+	"cd",
+	"help",
+	"exit"
+};
 
+int (*builtin_func[]) (char **) = {
+	&lsh_cd,
+	&lsh_help,
+	&lsh_exit
+};
 /*
  * Reads a line of input from the terminal
  */
@@ -177,27 +190,6 @@ lsh_launch(char **args)
 }
 
 int
-lsh_cd(char **args);
-
-int
-lsh_help(char **args);
-
-int
-lsh_exit(char **args);
-
-char* builtin_str[] = {
-	"cd",
-	"help",
-	"exit"
-};
-
-int (*builtin_func[]) (char **) = {
-	&lsh_cd,
-	&lsh_help,
-	&lsh_exit
-};
-
-int
 lsh_num_builtins() 
 {
 	return sizeof(builtin_str) / sizeof(char*);
@@ -273,6 +265,7 @@ lsh_loop(void)
 	char *line;
 	char **args;
 	int status;
+	enableRawMode();
 	do {
 		cyan();
 		printf("𝚿 ");
